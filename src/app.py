@@ -1,21 +1,12 @@
-from fastapi import FastAPI, UploadFile, File
-from langchain_core.documents import Document
-import torch
-from langchain_google_genai import GoogleGenerativeAI, GoogleGenerativeAIEmbeddings
-from langchain_community.vectorstores import FAISS
-from dotenv import load_dotenv
-import os
-from langchain_classic.chains import create_retrieval_chain, create_history_aware_retriever
-from langchain_classic.chains.combine_documents import create_stuff_documents_chain
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_huggingface import HuggingFaceEmbeddings
-import torch
-from utils import *
-from RAG import *
-import uvicorn
 import shutil
+
+import uvicorn
+from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from langchain_classic.chains import create_retrieval_chain, create_history_aware_retriever
 from pydantic import BaseModel
+
+from RAG import *
 
 app = FastAPI()
 
