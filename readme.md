@@ -1,48 +1,53 @@
-# Chatbot RAG sử dụng LangChain, FAISS và Gemini API
-
-## 📌 Tổng quan
-
-Dự án này xây dựng một **Chatbot RAG (Retrieval-Augmented Generation)** sử dụng:
-
-* **LangChain** để xây dựng pipeline truy vấn + sinh câu trả lời
-* **FAISS** làm vector store cho tìm kiếm tương đồng
-* **Google Gemini API** để sinh câu trả lời tự nhiên và chính xác
-
-Chatbot có khả năng trả lời các câu hỏi dựa trên **tài liệu của riêng bạn** thông qua quá trình truy xuất thông tin và tổng hợp bằng mô hình ngôn ngữ.
 
 ---
 
-## 🚀 Tính năng chính
+# RAG Chatbot using LangChain, FAISS, and Gemini API
 
-* 🔍 **Tìm kiếm ngữ nghĩa** bằng FAISS
-* 📄 **Hỗ trợ nhiều loại tài liệu**: PDF, text, markdown, docx
-* ✂️ **Tự động chunking + sinh embeddings**
-* 🧠 **Pipeline RAG hoàn chỉnh**: Retriever → LLM → Answer
-* 💬 **Hỗ trợ hội thoại có ngữ cảnh** (history-aware retriever)
-* ⚡ **Triển khai nhanh** với FastAPI
-* 📦 **Lưu trữ FAISS cục bộ** để tối ưu chi phí
+## 📌 Overview
+
+This project builds a **Retrieval-Augmented Generation (RAG) Chatbot** using:
+
+* **LangChain** for constructing the retrieval + generation pipeline
+* **FAISS** as the vector store for similarity search
+* **Google Gemini API** for generating natural and accurate responses
+
+The chatbot can answer questions based on **your own documents** through a retrieval process combined with language model generation.
 
 ---
+
+## 🚀 Key Features
+
+* 🔍 **Semantic search** powered by FAISS
+* 📄 **Supports multiple document types**: PDF, text, docx
+* ✂️ **Automatic chunking + embedding generation**
+* 🧠 **Full RAG pipeline**: Retriever → LLM → Answer
+* 💬 **Context-aware conversation support** (history-aware retriever)
+* ⚡ **Fast deployment** with FastAPI
+* 📦 **Local FAISS storage** to reduce costs
+
+---
+
 ## Demo
+
 ![Demo](./demo.gif)
 
-## 📂 Cấu trúc dự án
+## 📂 Project Structure
 
 ```
 project/
-├── docs                     # Lưu trữ các tài liệu 
-├── db                       # Lưu trữ vector FAISS
+├── docs                     # Document storage
+├── db                       # FAISS vector storage
 ├── src/
-│   ├── app.py               # Server FastAPI
-│   ├── RAG.py               # class RAG
-│   ├── utils.py             # Hàm hỗ trợ: chunking, loader
-│   └── db/                  # Lưu trữ vector FAISS
+│   ├── app.py               # FastAPI server
+│   ├── RAG.py               # RAG class
+│   ├── utils.py             # Helper functions: chunking, loaders
+│   └── index.html           # UI
 ├── requirements.txt
 ├── README.md
 └── .env                     # API keys
-
 ```
-## 🛠️ Công nghệ sử dụng
+
+## 🛠️ Technologies Used
 
 * Python 3.13
 * LangChain 1.x
@@ -54,55 +59,57 @@ project/
 
 ---
 
-## 🔧 Cài đặt
+## 🔧 Installation
 
-### 1️⃣ Clone dự án
+### 1️⃣ Clone the project
 
-```bash
-git clone <repo-url>
-cd project
+```
+git clone https://github.com/8thMay03/RAG-system.git
+cd RAG-system
 ```
 
-### 2️⃣ Cài đặt thư viện
+### 2️⃣ Install dependencies
 
-```bash
+```
 pip install -r requirements.txt
 ```
 
-### 3️⃣ Tạo file `.env`
+### 3️⃣ Create the `.env` file
 
 ```env
 GOOGLE_API_KEY=your_api_key_here
 ```
 
-## ▶️ Chạy server FastAPI
+## ▶️ Run the FastAPI server
 
-```bash
-uvicorn src.main:app --reload
+```
+python app.py
 ```
 
-API chạy tại:
+The API runs at:
 
 ```
 http://127.0.0.1:8000/
 ```
 
-## ▶️ Chạy giao diện
-    Chạy file index.html
+## ▶️ Run the UI
+
+Open the `index.html` file.
+
 ---
 
-## 🔗 Cách hoạt động của pipeline RAG
+## 🔗 How the RAG pipeline works
 
-1. Người dùng gửi câu hỏi
-2. Hệ thống sinh embedding từ câu hỏi
-3. FAISS truy xuất các chunk tài liệu liên quan nhất
-4. LangChain kết hợp context + câu hỏi
-5. Gemini API sinh câu trả lời dựa trên tài liệu
+1. The user sends a question
+2. The system generates an embedding from the query
+3. FAISS retrieves the most relevant document chunks
+4. LangChain combines the context with the query
+5. Gemini API generates an answer based on the documents
 
+---
 
 ## 📜 License
 
 MIT License.
 
 ---
-
