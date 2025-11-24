@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chatbot Tài liệu – Ollama RAG</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900">
+  <div class="max-w-3xl mx-auto p-4 sm:p-6">
+    <header class="flex items-center justify-between mb-4">
+      <h1 class="text-2xl sm:text-3xl font-bold">📄 Chatbot Tài liệu</h1>
+      <span class="text-xs sm:text-sm text-gray-500"></span>
+    </header>
+
+    <!-- Upload box -->
+    <section class="bg-white rounded-2xl shadow p-4 sm:p-6 mb-4">
+      <h2 class="font-semibold mb-3">1) Tải tài liệu (PDF/TXT)</h2>
+      <form id="uploadForm" class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+        <input id="fileInput" type="file" accept=".pdf,.txt" class="block w-full sm:w-auto text-sm" required />
+        <button id="uploadBtn" type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50">Tải lên & Lập chỉ mục</button>
+        <span id="uploadStatus" class="text-sm text-gray-600"></span>
+      </form>
+    </section>
+
+    <!-- Chat box -->
+    <section class="bg-white rounded-2xl shadow p-0 overflow-hidden">
+      <div id="messages" class="h-[56vh] overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-gray-50 to-white"></div>
+      <div class="border-t p-3">
+        <form id="chatForm" class="flex gap-2">
+          <input id="prompt" type="text" placeholder="Nhập câu hỏi bằng tiếng Việt..." class="flex-1 px-3 py-2 border rounded-xl focus:outline-none focus:ring focus:ring-indigo-200" required />
+          <button id="sendBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50" type="submit"">Gửi</button>
+        </form>
+        <p id="hint" class="text-xs text-gray-500 mt-2">Gợi ý: Hỏi nội dung có trong tài liệu. Nếu chưa tải tài liệu, hãy tải lên trước.</p>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const baseURL = "http://127.0.0.1:8000";
+
+    const api = {
+      upload: baseURL + '/upload',
+      chat: baseURL + '/chat',
+      test: baseURL + '/test'
+    };
+
+    const messagesEl = document.getElementById('messages');
+    const chatForm = document.getElementById('chatForm');
+    const promptEl = document.getElementById('prompt');
+    const sendBtn = document.getElementById('sendBtn');
+    const uploadForm = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('fileInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadStatus = document.getElementById('uploadStatus');
+
+    function addMsg(content, role = 'user') {
+      const wrap = document.createElement('div');
+      wrap.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'}`;
+      const bubble = document.createElement('div');
+      bubble.className = `max-w-[85%] px-3 py-2 rounded-2xl whitespace-pre-wrap shadow ${role === 'user' ? 'bg-indigo-600 text-white rounded-br-sm' : 'bg-gray-100 text-gray-900 rounded-bl-sm'}`;
+      bubble.textContent = content;
+      wrap.appendChild(bubble);
+      messagesEl.appendChild(wrap);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function setUploading(isUploading, text = '') {
+      uploadBtn.disabled = isUploading;
+      uploadStatus.textContent = text;
+    }
+
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!fileInput.files[0]) return;
+      setUploading(true, 'Đang tải & lập chỉ mục...');
+      try {
+        const fd = new FormData();
+        fd.append('file', fileInput.files[0]); // Tên field phải khớp với FastAPI UploadFile param
+        const res = await fetch(api.upload, { method: 'POST', body: fd });
+        if (!res.ok) {
+          throw new Error(await res.text());
+        }
+        const data = await res.json().catch(() => ({}));
+        setUploading(false, data.status || 'Đã lập chỉ mục xong ✅');
+      } catch (err) {
+        console.error(err);
+        setUploading(false, 'Lỗi: ' + (err?.message || 'không rõ'));
+      }
+    });
+
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const q = promptEl.value.trim();
+      if (!q) return;
+      addMsg(q, 'user');
+      promptEl.value = '';
+      sendBtn.disabled = true;
+
+      // Hiển thị placeholder đang trả lời
+      const thinking = document.createElement('div');
+      thinking.className = 'flex justify-start';
+      thinking.innerHTML = '<div class="max-w-[85%] px-3 py-2 rounded-2xl bg-gray-100 text-gray-600 shadow animate-pulse">Đang trả lời...</div>';
+      messagesEl.appendChild(thinking);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      try {
+        const res = await fetch(api.chat, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: q })
+        });
+        const data = await res.json();
+        thinking.remove();
+        if (data.answer) addMsg(data.answer, 'bot');
+        else if (data.result) addMsg(data.result, 'bot');
+        else if (data.error) addMsg('Lỗi: ' + data.error, 'bot');
+        else addMsg('(Không có phản hồi)', 'bot');
+      } catch (err) {
+        thinking.remove();
+        addMsg('Lỗi khi gọi API: ' + (err?.message || 'không rõ'), 'bot');
+      } finally {
+        sendBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
