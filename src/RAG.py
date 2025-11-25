@@ -10,6 +10,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import torch
+from langchain_core.runnables import Runnable, RunnablePassthrough
 from utils import *
 
 class RAG:
@@ -39,8 +40,14 @@ class RAG:
                 ("human", "{input}"),
             ]
         )
-        self.question_answer_chain = create_stuff_documents_chain(self.llm, prompt)
-        self.chain = create_retrieval_chain(self.retriever, self.question_answer_chain)
+        self.chain = (
+            {
+                "context": self.retriever,
+                "input": RunnablePassthrough()
+            }
+            | prompt
+            | self.llm
+        )
     
     def add_document(self, path):
         docs = load_file(path)
@@ -49,4 +56,4 @@ class RAG:
         return "Success!"
     
     def ask(self, question):
-        return self.chain.invoke({"input" : question})["answer"]
+        return self.chain.invoke(question)

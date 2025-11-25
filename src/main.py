@@ -26,7 +26,7 @@ system_prompt = (
     """
         Hãy sử dụng đúng ngữ cảnh được cung cấp để trả lời câu hỏi.
         Nếu không tìm thấy câu trả lời trong ngữ cảnh, hãy nói "Thông tin này không có trong tài liệu được cung cấp.".
-        Trả lời ngắn gọn tối đa ba câu. 
+        Trả lời ngắn gọn tối đa ba câu.
         Ngữ cảnh: {context}
     """
 )
@@ -34,19 +34,19 @@ system_prompt = (
 prompt = ChatPromptTemplate.from_messages(
     [
         ("system", system_prompt),
-        ("human", "{input}"),
+        ("human", "{question}"),
     ]
 )
 
 chain = (
     {
         "context": retriever,
-        "input": RunnablePassthrough()
+        "question": RunnablePassthrough()
     }
     | prompt
     | model
 )
 
 if __name__ == '__main__':
-    answer = chain.invoke("Nguyễn Quốc Khánh là ai?")
+    answer = chain.invoke("Điểm Toeic của Nguyễn Quốc Khánh là bao nhiêu?")
     print(answer)
