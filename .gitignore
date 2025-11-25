@@ -1,2 +1,6 @@
 .venv
 .env
+db
+.idea
+docs
+src/__pycache__

@@ -1,6 +1,6 @@
 from langchain_core.documents import Document
 import torch
-from langchain_google_genai import GoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+from langchain_google_genai import GoogleGenerativeAI
 from langchain_community.vectorstores import FAISS
 from dotenv import load_dotenv
 import os

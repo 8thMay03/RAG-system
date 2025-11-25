@@ -5,6 +5,7 @@ import os
 from langchain_classic.chains import create_retrieval_chain, create_history_aware_retriever
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import Runnable, RunnablePassthrough
 from langchain_huggingface import HuggingFaceEmbeddings
 import torch
 
@@ -37,9 +38,15 @@ prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-question_answer_chain = create_stuff_documents_chain(model, prompt)
-chain = create_retrieval_chain(retriever, question_answer_chain)
+chain = (
+    {
+        "context": retriever,
+        "input": RunnablePassthrough()
+    }
+    | prompt
+    | model
+)
 
-query = "Nguyễn Quốc Khánh là ai?"
-result = chain.invoke({"input" : query})
-print(result["answer"])
+if __name__ == '__main__':
+    answer = chain.invoke("Nguyễn Quốc Khánh là ai?")
+    print(answer)

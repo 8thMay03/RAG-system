@@ -24,10 +24,12 @@ DEVICE = ('cuda' if torch.cuda.is_available() else 'cpu')
 
 chatbot = RAG(device=DEVICE)
 
+# Test
 @app.get("/hello")
 def hello():
     return {"Hellp world!"}
 
+# Upload documents
 @app.post("/upload")
 def upload(file: UploadFile = File(...)):
     tmp_path = f"../docs/uploaded_docs/{file.filename}"
@@ -39,6 +41,7 @@ def upload(file: UploadFile = File(...)):
 class ChatRequest(BaseModel):
     query: str
 
+# Chat
 @app.post("/chat")
 def query(question: ChatRequest):
     answer = chatbot.ask(question.query)
