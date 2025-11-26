@@ -5,7 +5,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.runnables import RunnableLambda
 from utils import *
 from TextSplitter import TextSplitter
-from FaissStore import FaissStore
+from src.vector_stores.FaissStore import FaissStore
 
 class RAG:
     def __init__(self, device='cuda'):
