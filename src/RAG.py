@@ -3,9 +3,9 @@ from langchain_classic.chains import create_retrieval_chain, create_history_awar
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.runnables import RunnableLambda
-from utils import *
-from TextSplitter import TextSplitter
-from src.vector_stores.FaissStore import FaissStore
+from functions.utils import *
+from splitters.TextSplitter import TextSplitter
+from VectorStores.FaissStore import FaissStore
 
 class RAG:
     def __init__(self, device='cuda'):
