@@ -5,9 +5,10 @@ import os
 from langchain_classic.chains import create_retrieval_chain, create_history_aware_retriever
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import Runnable, RunnablePassthrough
+from langchain_core.runnables import Runnable, RunnablePassthrough, RunnableLambda
 from langchain_huggingface import HuggingFaceEmbeddings
 import torch
+from utils import *
 
 load_dotenv()
 os.environ["GOOGLE_API_KEY"] = os.getenv("GOOGLE_API_KEY")
@@ -39,10 +40,14 @@ prompt = ChatPromptTemplate.from_messages(
 )
 
 chain = (
-    {
-        "context": retriever,
-        "question": RunnablePassthrough()
-    }
+    RunnableLambda(lambda x : {
+        "docs": retriever.invoke(x),
+        "question": x
+    })
+    | RunnableLambda(lambda x :{
+        "context": combine_all_docs(x["docs"]),
+        "question": x["question"]
+    })
     | prompt
     | model
 )
