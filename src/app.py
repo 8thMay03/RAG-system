@@ -1,10 +1,12 @@
 import shutil
-
+import os
 import uvicorn
+from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from langchain_classic.chains import create_retrieval_chain, create_history_aware_retriever
 from pydantic import BaseModel
+import torch
 
 from RAG import *
 
@@ -26,12 +28,12 @@ chatbot = RAG(device=DEVICE)
 
 # Test
 @app.get("/hello")
-def hello():
+async def hello():
     return {"Hellp world!"}
 
 # Upload documents
 @app.post("/upload")
-def upload(file: UploadFile = File(...)):
+async def upload(file: UploadFile = File(...)):
     tmp_path = f"../docs/uploaded_docs/{file.filename}"
     with open(tmp_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
@@ -43,7 +45,7 @@ class ChatRequest(BaseModel):
 
 # Chat
 @app.post("/chat")
-def query(question: ChatRequest):
+async def query(question: ChatRequest):
     answer = chatbot.ask(question.query)
     return {"answer": answer}
 
