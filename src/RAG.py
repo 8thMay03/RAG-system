@@ -1,27 +1,24 @@
 from langchain_google_genai import GoogleGenerativeAI
-from langchain_community.vectorstores import FAISS
 from langchain_classic.chains import create_retrieval_chain, create_history_aware_retriever
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.runnables import Runnable, RunnablePassthrough, RunnableLambda
 from utils import *
+from TextSplitter import TextSplitter
+from FaissStore import FaissStore
 
 class RAG:
     def __init__(self, device):
         self.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2", model_kwargs={'device': device})
-
         init_doc = load_file(r'D:\GithubRepositories\RAG-system\docs\doc.txt')
-        self.splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=200,
-        )
-        chunks = self.splitter.split_documents(init_doc)
 
-        self.db = FAISS.from_documents(chunks, self.embeddings)
-        self.db.save_local("../db/faiss_index")
+        self.splitter = TextSplitter()
+        chunks = self.splitter.split(init_doc)
 
-        self.retriever = self.db.as_retriever(search_type="similarity", search_kwargs={"k": 3})
+        self.faiss_store = FaissStore(self.embeddings)
+        self.faiss_store.add(chunks)
+
+        self.retriever = self.faiss_store.get_retriever(k=3)
 
         self.llm = GoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.7)
 
@@ -54,8 +51,7 @@ class RAG:
     
     def add_document(self, path):
         docs = load_file(path)
-        chunks = self.splitter.split_documents(docs)
-        self.db.add_documents(chunks)
+        self.faiss_store.add(docs)
         return "Success!"
     
     def ask(self, question):
