@@ -10,11 +10,11 @@ class FaissStore:
         else:
             self.db = None
 
-    def add(self, documents):
+    def add(self, chunks):
         if self.db is None:
-            self.db = FAISS.from_documents(documents, self.embeddings)
+            self.db = FAISS.from_documents(chunks, self.embeddings)
         else:
-            self.db.add_documents(documents)
+            self.db.add_documents(chunks)
         self.db.save_local(self.index_path)
 
     def get_retriever(self, k=3):
