@@ -2,19 +2,21 @@ from langchain_google_genai import GoogleGenerativeAI
 from langchain_classic.chains import create_retrieval_chain, create_history_aware_retriever
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_core.runnables import Runnable, RunnablePassthrough, RunnableLambda
+from langchain_core.runnables import RunnableLambda
 from utils import *
 from TextSplitter import TextSplitter
 from FaissStore import FaissStore
 
 class RAG:
-    def __init__(self, device):
+    def __init__(self, device='cuda'):
         self.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2", model_kwargs={'device': device})
         init_doc = load_file(r'D:\GithubRepositories\RAG-system\docs\doc.txt')
 
+        # Split init_doc into chunks
         self.splitter = TextSplitter()
         chunks = self.splitter.split(init_doc)
 
+        # Add to faiss_store
         self.faiss_store = FaissStore(self.embeddings)
         self.faiss_store.add(chunks)
 
@@ -51,7 +53,8 @@ class RAG:
     
     def add_document(self, path):
         docs = load_file(path)
-        self.faiss_store.add(docs)
+        chunks = self.splitter.split(docs)
+        self.faiss_store.add(chunks)
         return "Success!"
     
     def ask(self, question):
