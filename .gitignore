@@ -1,6 +1,8 @@
 .venv
 .env
-db
+db/faiss_index/index.faiss
+db/faiss_index/index.pkl
 .idea
 docs
-src/__pycache__
+*.pyc
+
