@@ -5,10 +5,11 @@ class FaissRetriever:
         self.search_type = search_type
 
     def invoke(self, query):
+        # If faiss_store is None then we cant find any documents
         if self.faiss_store is None:
             return []
-        retriever = self.faiss_store.db.as_retriever(
-            search_type=self.search_type,
-            search_kwargs={"k": self.k},
-        )
+        retriever = self.faiss_store.get_retriever()
+        # If retriever is None then we cant find any documents
+        if retriever is None:
+            return []
         return retriever.invoke(query)

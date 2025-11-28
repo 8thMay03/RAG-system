@@ -25,4 +25,6 @@ class FaissStore:
         self.retriever = self.get_retriever()
 
     def get_retriever(self, k=3):
+        if self.db is None:
+            return None
         return self.db.as_retriever(search_type="similarity", search_kwargs={"k": k})

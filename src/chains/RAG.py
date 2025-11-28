@@ -7,26 +7,27 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.runnables import RunnableLambda
 from src.chains.prompts import QA_prompt
+from src.retrievers.FaissRetriever import FaissRetriever
+from src.splitters.TextSplitter import TextSplitter
 
 
 class RAG:
     def __init__(self, device='cuda'):
-        init_doc = load_file(r'D:\GithubRepositories\RAG-system\docs\doc.txt')
-
-        # Split init_doc into chunks
+        # Splitter
         self.splitter = TextSplitter()
-        chunked_docs = self.splitter.split(init_doc)
 
-        # Add to faiss_store
+        # Faiss store
         self.faiss_store = FaissStore()
-        self.faiss_store.add_documents(chunked_docs)
-        self.faiss_retriever = self.faiss_store.get_retriever(k=3)
+        self.faiss_retriever = FaissRetriever(self.faiss_store)
 
+        # LLM model
         self.llm = GoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.7)
 
+        # Prompt template
         qa_prompt = QA_prompt()
         prompt = qa_prompt.get_prompt()
 
+        # QA chain
         self.chain = (
             RunnableLambda(lambda x : {
                 "docs": self.faiss_retriever.invoke(x),
