@@ -14,6 +14,7 @@ class FaissStore:
             self.db = FAISS.load_local(index_path, self.embedding_model, allow_dangerous_deserialization=True)
         else:
             self.db = None
+        self.retriever = self.get_retriever()
 
     def add_documents(self, documents):
         if self.db is None:
@@ -21,6 +22,7 @@ class FaissStore:
         else:
             self.db.add_documents(documents)
         self.db.save_local(self.index_path)
+        self.retriever = self.get_retriever()
 
     def get_retriever(self, k=3):
         return self.db.as_retriever(search_type="similarity", search_kwargs={"k": k})
