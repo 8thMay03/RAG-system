@@ -7,7 +7,7 @@ DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2", model_kwargs={'device': DEVICE})
 
 class FaissStore:
-    def __init__(self, index_path="../db/faiss_index"):
+    def __init__(self, index_path="db/faiss_index"):
         self.index_path = index_path
         self.embedding_model = embedding_model
         if os.path.exists(index_path):
