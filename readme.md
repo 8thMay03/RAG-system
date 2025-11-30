@@ -39,9 +39,13 @@ project/
 ├── db                       # FAISS vector storage
 ├── src/
 │   ├── app.py               # FastAPI server
-│   ├── RAG.py               # RAG class
-│   ├── utils.py             # Helper functions: chunking, loaders
-│   └── index.html           # UI
+│   ├── chains               # QA chain, prompt 
+│   ├── functions            
+│   ├── llms
+│   ├── retrievers              
+│   ├── splitters            # Document splitter   
+│   ├── stores               # Vector storages
+│   └── UI           
 ├── requirements.txt
 ├── README.md
 └── .env                     # API keys

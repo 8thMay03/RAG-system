@@ -20,7 +20,7 @@ def load_file(path):
     else:
         raise ValueError("Unsupported file format")
 
-# Because context should be string so we need to convert List[Document] to string
+# convert List[Document] to string
 def combine_all_docs(docs):
     """
     :param docs: List[Document]
