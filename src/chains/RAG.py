@@ -1,13 +1,15 @@
 from src.functions.utils import *
 from src.splitters.TextSplitter import TextSplitter
-from src.stores.FaissStore import FaissStore
 from langchain_google_genai import GoogleGenerativeAI
 from langchain_classic.chains import create_retrieval_chain, create_history_aware_retriever
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.runnables import RunnableLambda
 from src.chains.prompts import QA_prompt
+from src.stores.FaissStore import FaissStore
+from src.stores.Bm25Store import Bm25Store
 from src.retrievers.FaissRetriever import FaissRetriever
+from src.retrievers.Bm25Retriever import Bm25Retriever
 from src.splitters.TextSplitter import TextSplitter
 
 
@@ -20,6 +22,10 @@ class RAG:
         self.faiss_store = FaissStore()
         self.faiss_retriever = FaissRetriever(self.faiss_store)
 
+        # BM25 store
+        self.bm25_store = Bm25Store()
+        self.bm25_retriever = Bm25Retriever(self.bm25_store)
+
         # LLM model
         self.llm = GoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.7)
 
@@ -30,7 +36,7 @@ class RAG:
         # QA chain
         self.chain = (
             RunnableLambda(lambda x : {
-                "docs": self.faiss_retriever.invoke(x),
+                "docs": self.bm25_retriever.invoke(x),
                 "question": x
             })
             | RunnableLambda(lambda x :{
@@ -45,6 +51,7 @@ class RAG:
         docs = load_file(path)
         chunked_docs = self.splitter.split(docs)
         self.faiss_store.add_documents(chunked_docs)
+        self.bm25_store.add_documents(chunked_docs)
         return "Success!"
     
     def ask(self, question):

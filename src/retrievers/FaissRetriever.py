@@ -4,6 +4,7 @@ class FaissRetriever:
         self.k = k
         self.search_type = search_type
 
+
     def invoke(self, query):
         # If faiss_store is None then we cant find any documents
         if self.faiss_store is None:
