@@ -8,6 +8,7 @@ from langchain_core.runnables import RunnableLambda
 from src.chains.prompts import QA_prompt
 from src.stores.FaissStore import FaissStore
 from src.stores.Bm25Store import Bm25Store
+from src.retrievers.HybridRetriever import HybridRetriever
 from src.retrievers.FaissRetriever import FaissRetriever
 from src.retrievers.Bm25Retriever import Bm25Retriever
 from src.splitters.TextSplitter import TextSplitter
@@ -26,6 +27,9 @@ class RAG:
         self.bm25_store = Bm25Store()
         self.bm25_retriever = Bm25Retriever(self.bm25_store)
 
+        # Hybrid retriever
+        self.hybrid_retriever = HybridRetriever(self.bm25_retriever, self.faiss_retriever)
+
         # LLM model
         self.llm = GoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.7)
 
@@ -36,7 +40,7 @@ class RAG:
         # QA chain
         self.chain = (
             RunnableLambda(lambda x : {
-                "docs": self.bm25_retriever.invoke(x),
+                "docs": self.hybrid_retriever.invoke(x),
                 "question": x
             })
             | RunnableLambda(lambda x :{
