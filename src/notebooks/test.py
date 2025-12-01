@@ -16,7 +16,7 @@ device = ('cuda' if torch.cuda.is_available() else 'cpu')
 
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2", model_kwargs={'device': device})
 
-db = FAISS.load_local("../db/faiss_index", embeddings, allow_dangerous_deserialization=True)
+db = FAISS.load_local("../../db/faiss_index", embeddings, allow_dangerous_deserialization=True)
 
 retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 3})
 

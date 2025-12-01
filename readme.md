@@ -36,16 +36,47 @@ The chatbot can answer questions based on **your own documents** through a retri
 ```
 project/
 ├── docs                     # Document storage
-├── db                       # FAISS vector storage
-├── src/
-│   ├── app.py               # FastAPI server
-│   ├── chains               # QA chain, prompt 
-│   ├── functions            
-│   ├── llms
-│   ├── retrievers              
-│   ├── splitters            # Document splitter   
-│   ├── stores               # Vector storages
-│   └── UI           
+├── db                       # vector storage
+src/
+├── chains/
+│   ├── __init__.py
+│   ├── prompts.py
+│   └── RAG.py
+│
+├── evaluation/
+│   ├── __init__.py
+│   └── ragas.py
+│
+├── functions/
+│   ├── __init__.py
+│   └── utils.py
+│
+├── lms/
+│   ├── __init__.py
+│   └── llm.py
+│
+├── notebooks/
+│   ├── __init__.py
+│   ├── test.ipynb
+│   └── test.py
+│
+├── retrievers/
+│   ├── __init__.py
+│   ├── Bm25Retriever.py
+│   ├── FaissRetriever.py
+│   └── HybridRetriever.py
+│
+├── splitters/
+│   ├── __init__.py
+│   └── TextSplitter.py
+│
+├── stores/
+│   ├── __init__.py
+│   ├── Bm25Store.py
+│   └── FaissStore.py
+│
+└── UI/
+│    └── index.html         
 ├── requirements.txt
 ├── README.md
 └── .env                     # API keys
@@ -84,10 +115,10 @@ pip install -r requirements.txt
 GOOGLE_API_KEY=your_api_key_here
 ```
 
-## ▶️ Run the FastAPI server
+## ▶️ Run the FastAPI server from RAG-system folder
 
 ```
-python app.py
+python -m src.app
 ```
 
 The API runs at:
