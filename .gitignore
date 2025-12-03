@@ -2,6 +2,7 @@
 .env
 db/faiss_index/index.faiss
 db/faiss_index/index.pkl
+db/bm25_index/index.json
 .idea
 docs
 *.pyc

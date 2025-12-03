@@ -49,8 +49,8 @@ class ChatRequest(BaseModel):
 
 # Chat
 @app.post("/chat")
-async def query(question: ChatRequest):
-    answer = chatbot.ask(question.query)
+async def query(chat_request: ChatRequest):
+    answer = chatbot.ask(chat_request.query)
     return {"answer": answer}
 
 

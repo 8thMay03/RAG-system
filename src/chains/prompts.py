@@ -6,8 +6,9 @@ class QA_prompt:
         self.system_prompt = (
             """
                 Hãy sử dụng đúng ngữ cảnh được cung cấp để trả lời câu hỏi.
+                Bạn hãy trả lời chi tiết và đầy đủ, không giới hạn số câu.
+                Không được tóm tắt. Viết đầy đủ toàn bộ kết quả. 
                 Nếu không tìm thấy câu trả lời trong ngữ cảnh, hãy nói "Thông tin này không có trong tài liệu được cung cấp.".
-                Trả lời ngắn gọn tối đa ba câu. 
                 Ngữ cảnh: {context}
             """
         )

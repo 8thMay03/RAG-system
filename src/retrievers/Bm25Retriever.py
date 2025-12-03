@@ -1,5 +1,5 @@
 class Bm25Retriever:
-    def __init__(self, bm25_store, k=3):
+    def __init__(self, bm25_store, k=30):
         self.bm25_store = bm25_store
         self.k = k
 

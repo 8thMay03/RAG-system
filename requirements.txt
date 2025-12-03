@@ -1,6 +1,13 @@
 langchain
-langchain_community
-langchain_google_genai
+langchain_community~=0.4.1
+langchain_google_genai~=3.0.3
 google-generativeai
 faiss-cpu
 pymupdf
+uvicorn~=0.38.0
+torch~=2.7.1+cu118
+python-dotenv~=1.2.1
+fastapi~=0.121.3
+pydantic~=2.12.4
+langchain-core~=1.1.0
+langchain-text-splitters~=1.0.0

@@ -1,5 +1,5 @@
 class FaissRetriever:
-    def __init__(self, faiss_store, k=3, search_type="similarity"):
+    def __init__(self, faiss_store, k=20, search_type="similarity"):
         self.faiss_store = faiss_store
         self.k = k
         self.search_type = search_type

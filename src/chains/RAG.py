@@ -12,6 +12,7 @@ from src.retrievers.HybridRetriever import HybridRetriever
 from src.retrievers.FaissRetriever import FaissRetriever
 from src.retrievers.Bm25Retriever import Bm25Retriever
 from src.splitters.TextSplitter import TextSplitter
+from src.llms.llm import GeminiPro, GeminiFlash
 
 
 class RAG:
@@ -31,7 +32,7 @@ class RAG:
         self.hybrid_retriever = HybridRetriever(self.bm25_retriever, self.faiss_retriever)
 
         # LLM model
-        self.llm = GoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.7)
+        self.llm = GeminiFlash().get_model()
 
         # Prompt template
         qa_prompt = QA_prompt()
