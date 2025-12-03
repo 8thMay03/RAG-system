@@ -2,7 +2,7 @@ from collections import defaultdict
 
 
 class HybridRetriever:
-    def __init__(self, bm25_retriever, faiss_retriever, k=5, rrf_k=60):
+    def __init__(self, bm25_retriever, faiss_retriever, k=20, rrf_k=60):
         self.bm25_retriever = bm25_retriever
         self.faiss_retriever = faiss_retriever
         self.k = k

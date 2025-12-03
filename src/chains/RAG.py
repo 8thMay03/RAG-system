@@ -13,6 +13,7 @@ from src.retrievers.FaissRetriever import FaissRetriever
 from src.retrievers.Bm25Retriever import Bm25Retriever
 from src.splitters.TextSplitter import TextSplitter
 from src.llms.llm import GeminiPro, GeminiFlash
+from src.chains.Reranker import CrossEncoderReranker
 
 
 class RAG:
@@ -31,6 +32,9 @@ class RAG:
         # Hybrid retriever
         self.hybrid_retriever = HybridRetriever(self.bm25_retriever, self.faiss_retriever)
 
+        # Reranker
+        self.reranker = CrossEncoderReranker()
+
         # LLM model
         self.llm = GeminiFlash().get_model()
 
@@ -43,6 +47,10 @@ class RAG:
             RunnableLambda(lambda x : {
                 "docs": self.hybrid_retriever.invoke(x),
                 "question": x
+            })
+            | RunnableLambda(lambda x : {
+                "docs": self.reranker.rerank(x["question"], x["docs"]),
+                "question": x["question"]
             })
             | RunnableLambda(lambda x :{
                 "context": combine_all_docs(x["docs"]),
