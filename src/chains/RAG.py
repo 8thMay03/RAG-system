@@ -1,9 +1,5 @@
 from src.functions.utils import *
-from src.splitters.TextSplitter import TextSplitter
-from langchain_google_genai import GoogleGenerativeAI
 from langchain_classic.chains import create_retrieval_chain, create_history_aware_retriever
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_core.runnables import RunnableLambda
 from src.chains.prompts import QA_prompt
 from src.stores.FaissStore import FaissStore
@@ -12,7 +8,7 @@ from src.retrievers.HybridRetriever import HybridRetriever
 from src.retrievers.FaissRetriever import FaissRetriever
 from src.retrievers.Bm25Retriever import Bm25Retriever
 from src.splitters.TextSplitter import TextSplitter
-from src.llms.llm import GeminiPro, GeminiFlash
+from src.llms.llm import Mistral, GeminiFlash
 from src.chains.Reranker import CrossEncoderReranker
 
 

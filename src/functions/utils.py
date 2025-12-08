@@ -1,5 +1,6 @@
 from langchain_community.document_loaders import PyPDFLoader, TextLoader, Docx2txtLoader 
 from langchain_core.documents import Document
+import json
 
 def load_file(path):
     if path.endswith('.pdf'): # PDF file
