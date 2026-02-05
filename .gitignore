@@ -7,3 +7,8 @@ db/bm25_index/index.json
 docs
 *.pyc
 
+IMPLEMENTATION_GUIDE.md
+IMPROVEMENTS_SUMMARY.md
+RAG_IMPROVEMENTS.md
+REVIEW.md
+evaluation_results.csv
