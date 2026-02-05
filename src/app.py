@@ -30,7 +30,7 @@ chatbot = RAG(device=DEVICE)
 # Test
 @app.get("/hello")
 async def hello():
-    return {"Hellp world!"}
+    return {"Hello world!"}
 
 
 # Upload documents

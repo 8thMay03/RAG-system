@@ -11,3 +11,8 @@ fastapi~=0.121.3
 pydantic~=2.12.4
 langchain-core~=1.1.0
 langchain-text-splitters~=1.0.0
+ragas
+datasets
+pandas
+sentence-transformers
+langchain-huggingface
