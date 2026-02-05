@@ -26,13 +26,15 @@ class Bm25Store:
         # Add new_docs
         self.documents.extend(new_docs)
 
-        # Add new_docs to json file
-        json_new_docs = [
+        # Save ALL documents to json file (not just new_docs)
+        json_all_docs = [
             {"page_content": doc.page_content, "metadata": doc.metadata}
-            for doc in new_docs
+            for doc in self.documents
         ]
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(self.index_path), exist_ok=True)
         with open(self.index_path, 'w', encoding='utf-8') as f:
-            json.dump(json_new_docs, f, ensure_ascii=False, indent=2)
+            json.dump(json_all_docs, f, ensure_ascii=False, indent=2)
 
         self.retriever = self.get_retriever()
 

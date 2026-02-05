@@ -12,7 +12,6 @@ import pandas as pd
 import torch
 import os
 from dotenv import load_dotenv
-import asyncio
 import time
 
 # Import RunConfig với fallback
