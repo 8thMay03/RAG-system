@@ -1,40 +1,202 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Chatbot Tài liệu – Ollama RAG</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 10px;
+    }
+
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .typing-dot {
+      animation: typing 1.4s infinite ease-in-out both;
+    }
+
+    .typing-dot:nth-child(1) {
+      animation-delay: -0.32s;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: -0.16s;
+    }
+
+    @keyframes typing {
+
+      0%,
+      80%,
+      100% {
+        transform: scale(0);
+      }
+
+      40% {
+        transform: scale(1);
+      }
+    }
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-900">
-  <div class="max-w-3xl mx-auto p-4 sm:p-6">
-    <header class="flex items-center justify-between mb-4">
-      <h1 class="text-2xl sm:text-3xl font-bold">📄 Chatbot Tài liệu</h1>
-      <span class="text-xs sm:text-sm text-gray-500"></span>
+
+<body class="bg-slate-50 text-slate-800 min-h-screen relative overflow-hidden flex flex-col">
+  <!-- Decorative background elements -->
+  <div
+    class="absolute top-[-10%] left-[-10%] w-[40%] text-transparent h-[40%] rounded-full bg-indigo-300/20 blur-[100px] pointer-events-none">
+  </div>
+  <div
+    class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-300/20 blur-[100px] pointer-events-none">
+  </div>
+
+  <div class="max-w-5xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col flex-1 relative z-10 h-screen">
+
+    <!-- Header -->
+    <header class="flex items-center justify-between mb-8 animate-fade-in-down flex-shrink-0">
+      <div class="flex items-center gap-4">
+        <div
+          class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 text-white">
+          <i class="ph ph-robot text-3xl"></i>
+        </div>
+        <div>
+          <h1
+            class="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 tracking-tight">
+            Trợ lý AI phân tích tài liệu</h1>
+        </div>
+      </div>
     </header>
 
-    <!-- Upload box -->
-    <section class="bg-white rounded-2xl shadow p-4 sm:p-6 mb-4">
-      <h2 class="font-semibold mb-3">1) Tải tài liệu (PDF/TXT)</h2>
-      <form id="uploadForm" class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-        <input id="fileInput" type="file" accept=".pdf,.txt" class="block w-full sm:w-auto text-sm" required />
-        <button id="uploadBtn" type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50">Tải lên & Lập chỉ mục</button>
-        <span id="uploadStatus" class="text-sm text-gray-600"></span>
-      </form>
-    </section>
+    <div class="flex flex-col md:flex-row gap-6 flex-1 min-h-0 pb-4">
 
-    <!-- Chat box -->
-    <section class="bg-white rounded-2xl shadow p-0 overflow-hidden">
-      <div id="messages" class="h-[56vh] overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-gray-50 to-white"></div>
-      <div class="border-t p-3">
-        <form id="chatForm" class="flex gap-2">
-          <input id="prompt" type="text" placeholder="Nhập câu hỏi bằng tiếng Việt..." class="flex-1 px-3 py-2 border rounded-xl focus:outline-none focus:ring focus:ring-indigo-200" required />
-          <button id="sendBtn" class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50" type="submit"">Gửi</button>
-        </form>
-        <p id="hint" class="text-xs text-gray-500 mt-2">Gợi ý: Hỏi nội dung có trong tài liệu. Nếu chưa tải tài liệu, hãy tải lên trước.</p>
-      </div>
-    </section>
+      <!-- Sidebar / Config -->
+      <aside class="w-full md:w-80 flex flex-col gap-6 flex-shrink-0">
+        <!-- Upload box -->
+        <section
+          class="glass-panel rounded-3xl shadow-xl shadow-slate-200/50 p-6 flex flex-col transition-all duration-300">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+              <i class="ph ph-file-arrow-up text-xl"></i>
+            </div>
+            <h2 class="font-semibold text-slate-700">Tải tài liệu</h2>
+          </div>
 
+          <form id="uploadForm" class="flex flex-col gap-4 relative">
+            <div class="relative group">
+              <input id="fileInput" type="file" accept=".pdf,.txt"
+                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" required />
+              <div
+                class="border-2 border-dashed border-slate-300 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-2 transition-all duration-300 group-hover:border-indigo-400 group-hover:bg-indigo-50/50">
+                <i
+                  class="ph ph-cloud-arrow-up text-3xl text-slate-400 group-hover:text-indigo-500 transition-colors"></i>
+                <div>
+                  <p class="text-sm font-medium text-slate-600 group-hover:text-indigo-600 transition-colors">Chọn file
+                    hoặc kéo thả</p>
+                  <p class="text-xs text-slate-400 mt-1">Hỗ trợ PDF, TXT</p>
+                  <p id="fileNameDisplay" class="text-xs font-semibold text-indigo-600 mt-2 truncate w-48 hidden"></p>
+                </div>
+              </div>
+            </div>
+
+            <button id="uploadBtn" type="submit"
+              class="w-full py-3 rounded-xl bg-slate-800 text-white font-medium hover:bg-slate-700 transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 relative overflow-hidden group">
+              <span class="relative z-10 flex items-center gap-2">
+                <i class="ph ph-upload-simple"></i>
+                Lập chỉ mục
+              </span>
+              <div class="absolute inset-0 h-full w-full border-t border-white/20 rounded-xl"></div>
+            </button>
+            <div id="uploadStatus" class="text-sm text-center font-medium mt-1 min-h-[20px]"></div>
+          </form>
+        </section>
+
+        <!-- Info Card -->
+        <section
+          class="glass-panel rounded-3xl shadow-xl shadow-slate-200/50 p-6 hidden md:block text-sm text-slate-500 space-y-4">
+          <div class="flex items-start gap-3">
+            <i class="ph ph-info text-xl text-indigo-500"></i>
+            <p class="leading-relaxed">Tải tài liệu lên trước để chatbot có thể truy xuất thông tin chính xác nhất.</p>
+          </div>
+          <div class="flex items-start gap-3">
+            <i class="ph ph-shield-check text-xl text-emerald-500"></i>
+            <p class="leading-relaxed">Dữ liệu được xử lý cục bộ và không chia sẻ ra bên ngoài mạng của bạn.</p>
+          </div>
+        </section>
+      </aside>
+
+      <!-- Main Chat Area -->
+      <main
+        class="flex-1 flex flex-col glass-panel rounded-3xl shadow-xl shadow-slate-200/50 overflow-hidden border border-white/60">
+        <!-- Chat Header -->
+        <div
+          class="px-6 py-4 border-b border-white/40 bg-white/40 flex items-center justify-between backdrop-blur-md z-10">
+          <div class="flex items-center gap-3">
+            <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+            <span class="text-sm font-semibold text-slate-700">Trợ lý bắt đầu sẵn sàng</span>
+          </div>
+          <button id="clearChatBtn"
+            class="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+            title="Xóa lịch sử chat">
+            <i class="ph ph-trash text-lg"></i>
+          </button>
+        </div>
+
+        <!-- Messages list -->
+        <div id="messages"
+          class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 bg-gradient-to-b from-transparent to-white/30 scroll-smooth">
+
+          <!-- Welcome message -->
+          <div class="flex justify-start">
+            <div class="flex items-end gap-3 max-w-full">
+              <div
+                class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 border border-indigo-200 flex items-center justify-center text-indigo-600 flex-shrink-0 mb-1">
+                <i class="ph ph-robot text-lg"></i>
+              </div>
+              <div
+                class="max-w-[100%] sm:max-w-[85%] px-5 py-3.5 rounded-2xl rounded-bl-sm bg-white/80 shadow-sm border border-slate-100 text-slate-700 whitespace-pre-wrap leading-relaxed">
+                Xin chào! 👋 Tôi là trợ lý AI có thể giúp bạn đọc và tóm tắt tài liệu.
+                Vui lòng tải lên một file tài liệu ở cột bên trái để chúng ta bắt đầu trao đổi nội dung nhé.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Chat Input Area -->
+        <div class="p-4 sm:p-6 bg-white/60 backdrop-blur-lg border-t border-slate-100/60 transition-all">
+          <form id="chatForm" class="relative group">
+            <input id="prompt" type="text" placeholder="Hỏi bất cứ điều gì về tài liệu..."
+              class="w-full pl-5 pr-14 py-4 bg-white/90 border border-slate-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 transition-all shadow-sm placeholder:text-slate-400"
+              required />
+            <button id="sendBtn"
+              class="absolute right-2 top-1/2 -translate-y-1/2 w-11 h-11 rounded-xl bg-indigo-600 text-white flex items-center justify-center hover:bg-indigo-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-indigo-500/30 active:scale-95"
+              type="submit">
+              <i class="ph ph-paper-plane-right text-xl"></i>
+            </button>
+          </form>
+        </div>
+      </main>
+
+    </div>
   </div>
 
   <script>
@@ -54,39 +216,88 @@
     const fileInput = document.getElementById('fileInput');
     const uploadBtn = document.getElementById('uploadBtn');
     const uploadStatus = document.getElementById('uploadStatus');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const clearChatBtn = document.getElementById('clearChatBtn');
+
+    // Mảng lưu DOM node của message mặc định để không xóa
+    const welcomeMsgHTML = messagesEl.innerHTML;
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        fileNameDisplay.textContent = e.target.files[0].name;
+        fileNameDisplay.classList.remove('hidden');
+      } else {
+        fileNameDisplay.classList.add('hidden');
+      }
+    });
+
+    clearChatBtn.addEventListener('click', () => {
+      messagesEl.innerHTML = welcomeMsgHTML;
+    });
 
     function addMsg(content, role = 'user') {
       const wrap = document.createElement('div');
-      wrap.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'}`;
+      wrap.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in-up`;
+
+      const innerWrapper = document.createElement('div');
+      innerWrapper.className = 'flex items-end gap-3 max-w-full';
+
       const bubble = document.createElement('div');
-      bubble.className = `max-w-[85%] px-3 py-2 rounded-2xl whitespace-pre-wrap shadow ${role === 'user' ? 'bg-indigo-600 text-white rounded-br-sm' : 'bg-gray-100 text-gray-900 rounded-bl-sm'}`;
+      bubble.className = `px-5 py-3.5 rounded-2xl shadow-sm leading-relaxed whitespace-pre-wrap text-[15px] ${role === 'user'
+        ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white rounded-br-sm shadow-indigo-500/20 max-w-prose'
+        : 'bg-white/90 border border-slate-100 text-slate-700 rounded-bl-sm max-w-[100%] sm:max-w-prose'
+        }`;
       bubble.textContent = content;
-      wrap.appendChild(bubble);
+
+      if (role === 'bot') {
+        const avatar = document.createElement('div');
+        avatar.className = 'w-8 h-8 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 border border-indigo-200 flex items-center justify-center text-indigo-600 flex-shrink-0 mb-1';
+        avatar.innerHTML = '<i class="ph ph-robot text-lg"></i>';
+        innerWrapper.appendChild(avatar);
+        innerWrapper.appendChild(bubble);
+      } else {
+        innerWrapper.appendChild(bubble);
+      }
+
+      wrap.appendChild(innerWrapper);
       messagesEl.appendChild(wrap);
-      messagesEl.scrollTop = messagesEl.scrollHeight;
+      messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
     }
 
-    function setUploading(isUploading, text = '') {
+    function setUploading(isUploading, text = '', type = 'info') {
       uploadBtn.disabled = isUploading;
+      if (isUploading) {
+        uploadBtn.innerHTML = '<i class="ph ph-spinner-gap animate-spin text-lg"></i> <span class="relative w-28 text-left">Đang xử lý...</span>';
+      } else {
+        uploadBtn.innerHTML = '<i class="ph ph-check-circle text-lg"></i> <span class="relative w-28 text-left">Hoàn tất!</span>';
+        setTimeout(() => {
+          uploadBtn.innerHTML = '<span class="relative z-10 flex items-center justify-center gap-2"><i class="ph ph-upload-simple text-lg"></i>Lập chỉ mục lại</span>';
+        }, 3000);
+      }
       uploadStatus.textContent = text;
+
+      uploadStatus.className = 'text-sm text-center font-medium mt-2 transition-colors min-h-[20px] ';
+      if (type === 'error') uploadStatus.classList.add('text-rose-500');
+      else if (type === 'success') uploadStatus.classList.add('text-emerald-600');
+      else uploadStatus.classList.add('text-indigo-600', 'animate-pulse');
     }
 
     uploadForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!fileInput.files[0]) return;
-      setUploading(true, 'Đang tải & lập chỉ mục...');
+      setUploading(true, 'Đang gửi tài liệu lên server...', 'info');
       try {
         const fd = new FormData();
-        fd.append('file', fileInput.files[0]); // Tên field phải khớp với FastAPI UploadFile param
+        fd.append('file', fileInput.files[0]);
         const res = await fetch(api.upload, { method: 'POST', body: fd });
         if (!res.ok) {
           throw new Error(await res.text());
         }
         const data = await res.json().catch(() => ({}));
-        setUploading(false, data.status || 'Đã lập chỉ mục xong ✅');
+        setUploading(false, data.status || 'Đã phân tích xong ✅', 'success');
       } catch (err) {
         console.error(err);
-        setUploading(false, 'Lỗi: ' + (err?.message || 'không rõ'));
+        setUploading(false, 'Lỗi: ' + (err?.message || 'không rõ'), 'error');
       }
     });
 
@@ -97,13 +308,25 @@
       addMsg(q, 'user');
       promptEl.value = '';
       sendBtn.disabled = true;
+      sendBtn.innerHTML = '<i class="ph ph-circle-notch animate-spin text-xl"></i>';
 
       // Hiển thị placeholder đang trả lời
-      const thinking = document.createElement('div');
-      thinking.className = 'flex justify-start';
-      thinking.innerHTML = '<div class="max-w-[85%] px-3 py-2 rounded-2xl bg-gray-100 text-gray-600 shadow animate-pulse">Đang trả lời...</div>';
-      messagesEl.appendChild(thinking);
-      messagesEl.scrollTop = messagesEl.scrollHeight;
+      const thinkingWrap = document.createElement('div');
+      thinkingWrap.className = 'flex justify-start animate-fade-in-up';
+      thinkingWrap.innerHTML = `
+        <div class="flex items-end gap-3 max-w-full">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 border border-slate-200 flex items-center justify-center text-slate-400 flex-shrink-0 mb-1">
+            <i class="ph ph-robot text-lg"></i>
+          </div>
+          <div class="px-5 py-3.5 rounded-2xl rounded-bl-sm bg-white/90 border border-slate-100 shadow-sm flex gap-1.5 items-center h-[52px]">
+            <div class="w-2 h-2 rounded-full bg-indigo-400 typing-dot"></div>
+            <div class="w-2 h-2 rounded-full bg-indigo-400 typing-dot"></div>
+            <div class="w-2 h-2 rounded-full bg-indigo-400 typing-dot"></div>
+          </div>
+        </div>
+      `;
+      messagesEl.appendChild(thinkingWrap);
+      messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
 
       try {
         const res = await fetch(api.chat, {
@@ -112,18 +335,40 @@
           body: JSON.stringify({ query: q })
         });
         const data = await res.json();
-        thinking.remove();
+        thinkingWrap.remove();
         if (data.answer) addMsg(data.answer, 'bot');
         else if (data.result) addMsg(data.result, 'bot');
         else if (data.error) addMsg('Lỗi: ' + data.error, 'bot');
         else addMsg('(Không có phản hồi)', 'bot');
       } catch (err) {
-        thinking.remove();
-        addMsg('Lỗi khi gọi API: ' + (err?.message || 'không rõ'), 'bot');
+        thinkingWrap.remove();
+        addMsg('Lỗi khi gọi API: ' + (err?.message || 'Không thể kết nối máy chủ'), 'bot');
       } finally {
         sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="ph ph-paper-plane-right text-xl"></i>';
+        promptEl.focus();
       }
     });
+
+    // Custom animation classes config
+    document.head.insertAdjacentHTML("beforeend", `<style>
+      .animate-fade-in-up {
+        animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      .animate-fade-in-down {
+        animation: fadeInDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    </style>`);
+
   </script>
 </body>
+
 </html>

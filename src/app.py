@@ -9,12 +9,12 @@ from langchain_classic.chains import create_retrieval_chain, create_history_awar
 from pydantic import BaseModel
 import torch
 
-from src.chains.RAG import *
+from src.chains.ImprovedRAG import ImprovedRAG
 
 app = FastAPI(
     title="RAG System API",
-    description="API cho hệ thống RAG với Hybrid Retrieval",
-    version="1.0.0"
+    description="API cho hệ thống RAG với Hybrid Retrieval và Advanced Features",
+    version="2.0.0"
 )
 
 app.add_middleware(
@@ -37,13 +37,42 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 ALLOWED_EXTENSIONS = {'.pdf', '.txt', '.docx'}
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
 
-chatbot = RAG(device=DEVICE)
+# Khởi tạo Improved RAG với các tính năng nâng cao
+chatbot = ImprovedRAG(
+    device=DEVICE,
+    use_query_expansion=True,      # Bật query expansion để tăng recall
+    use_query_classification=True,  # Bật adaptive retrieval theo query type
+    use_parent_child=False         # Tắt parent-child chunking (có thể bật nếu muốn)
+)
 
 
 # Test
 @app.get("/hello")
 async def hello():
     return {"message": "Hello world!"}
+
+
+# System info
+@app.get("/info")
+async def info():
+    """Thông tin về hệ thống RAG."""
+    from src.splitters.ParentChildTextSplitter import ParentChildTextSplitter
+    
+    return {
+        "version": "2.0.0",
+        "rag_type": "ImprovedRAG",
+        "features": {
+            "query_expansion": chatbot.use_query_expansion,
+            "query_classification": chatbot.use_query_classification,
+            "parent_child_chunking": isinstance(chatbot.splitter, ParentChildTextSplitter),
+        },
+        "device": DEVICE,
+        "hybrid_retriever": {
+            "bm25_weight": round(chatbot.hybrid_retriever.bm25_weight, 2),
+            "faiss_weight": round(chatbot.hybrid_retriever.faiss_weight, 2),
+            "k": chatbot.hybrid_retriever.k,
+        }
+    }
 
 
 # Upload documents

@@ -1,6 +1,6 @@
 # 🚀 RAG System - Advanced Retrieval-Augmented Generation
 
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.1313+-blue.svg)](https://www.python.org/)
 [![LangChain](https://img.shields.io/badge/LangChain-1.x-green.svg)](https://www.langchain.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -443,13 +443,6 @@ MIT License - see LICENSE file for details.
 - [FAISS](https://github.com/facebookresearch/faiss) - Vector search
 - [RAGAS](https://github.com/explodinggradients/ragas) - Evaluation framework
 - [Google Gemini](https://ai.google.dev/) - LLM API
-
----
-
-## 📞 Contact
-
-- GitHub: [8thMay03/RAG-system](https://github.com/8thMay03/RAG-system)
-- Issues: [GitHub Issues](https://github.com/8thMay03/RAG-system/issues)
 
 ---
 
